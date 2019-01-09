@@ -9,25 +9,38 @@ if [ ! -e /etc/openvpn/minke-client.ovpn ]; then
   exit 1
 fi
 
+# Extract port and protocol
+remote=$(grep '^remote ' /etc/openvpn/minke-client.ovpn)
+remote=${remote#* * }
+PORT=${remote%% *}
+PROTO=${remote#* }
+
 # Firewall setup
+route del default
 
-#iptables -P INPUT DROP
-#iptables -P FORWARD DROP
-#iptables -P OUTPUT ACCEPT
+# HOME_INTERFACE
+# Allow traffic in and out if we've started a connection out
+iptables -A INPUT  -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -i ${HOME_INTERFACE}
+# Allow OpenVPN traffic in and out (tcp or udp) - **ports switch from server version**
+iptables -A INPUT  -p ${PROTO} --sport ${PORT} -j ACCEPT -i ${HOME_INTERFACE}
+iptables -A OUTPUT -p ${PROTO} --dport ${PORT} -j ACCEPT -o ${HOME_INTERFACE}
+# Allow DHCP traffic in and out
+iptables -A INPUT  -p udp --dport 68 -j ACCEPT -i ${HOME_INTERFACE}
+iptables -A OUTPUT -p udp --sport 68 -j ACCEPT -o ${HOME_INTERFACE}
+# Allow UPnP traffic in and out
+iptables -A INPUT  -p udp --sport 1900 -j ACCEPT -i ${HOME_INTERFACE}
+iptables -A OUTPUT -p udp --dport 1900 -j ACCEPT -o ${HOME_INTERFACE}
+# Block all other outgoing UDP traffic
+iptables -A OUTPUT -p udp -j DROP  -o ${HOME_INTERFACE}
+# Drop anything else incoming
+iptables -A INPUT  -j DROP -i ${HOME_INTERFACE}
 
-# Localhost okay
-#iptables -A INPUT -i lo -j ACCEPT
-#iptables -A OUTPUT -o lo -j ACCEPT
-
-# Only accept incoming traffic if there's an outgoing connection already
-#iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# INTERNAL_INTERFACE -> HOME_INTERFACE
+# Block any traffic between these interfaces
+iptables -A FORWARD -j DROP -i ${INTERNAL_INTERFACE} -o ${HOME_INTERFACE}
 
 openvpn --config /etc/openvpn/minke-client.ovpn --daemon
 
-# NAT firewall (${INTERNAL_INTERFACE} -> ${EXTERNAL_INTERFACE})
-iptables -t nat -A POSTROUTING -o ${EXTERNAL_INTERFACE} -j MASQUERADE
-iptables -A FORWARD -i ${EXTERNAL_INTERFACE} -o ${INTERNAL_INTERFACE} -m state --state RELATED,ESTABLISHED -j ACCEPT
-iptables -A FORWARD -i ${INTERNAL_INTERFACE} -o ${EXTERNAL_INTERFACE} -j ACCEPT
 
 # UPNP
 echo "
@@ -57,7 +70,6 @@ disable-publishing=yes
 enable-reflector=yes
 " > /etc/avahi-daemon.conf
 avahi-daemon --no-drop-root --daemonize --file=/etc/avahi-daemon.conf
-iptables -A INPUT -i ${EXTERNAL_INTERFACE} -p udp --dport 5353 -j ACCEPT
 
 trap "killall sleep openvpn miniupnpd avahi-daemon; exit" TERM INT
 
