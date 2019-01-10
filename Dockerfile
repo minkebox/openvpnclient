@@ -1,9 +1,11 @@
 FROM alpine:edge
 
-RUN apk --no-cache add openvpn easy-rsa miniupnpd avahi ;\
-    rm -f /etc/openvpn/* /etc/miniupnpd/* /etc/avahi/services/*.service /etc/avahi/avahi-daemon.conf
+RUN apk --no-cache add openvpn easy-rsa miniupnpd nodejs npm ;\
+    rm -f /etc/openvpn/* /etc/miniupnpd/*
 
 COPY root/ /
+
+RUN cd /mDNS ; npm install
 
 VOLUME /etc/openvpn
 
