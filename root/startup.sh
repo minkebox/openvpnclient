@@ -20,7 +20,7 @@ echo ${PASSWORD} >> ${AUTH}
 
 openvpn --config ${CONFIG} --daemon --auth-user-pass ${AUTH} --script-security 2 --up "/usr/bin/env INTERNAL_INTERFACE=${INTERNAL_INTERFACE} EXTERNAL_INTERFACE=${EXTERNAL_INTERFACE} /vpn-up.sh"
 
-trap "killall sleep openvpn; exit" TERM INT
+trap "killall sleep openvpn dnsmasq; exit" TERM INT
 
 sleep 2147483647d &
 wait "$!"
