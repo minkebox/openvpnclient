@@ -2,7 +2,7 @@
 
 env > /tmp/openvpnclient
 
-PORT=${local_port}
+PORT=${local_port_1}
 EXTERNAL_REMOTE_IP=${route_vpn_gateway}
 
 # Create PORTS nat list.
