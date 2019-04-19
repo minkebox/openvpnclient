@@ -3,7 +3,7 @@
 env > /tmp/openvpnclient
 
 PORT=${local_port}
-EXTERNAL_REMOTE_IP=${ifconfig_remote}
+EXTERNAL_REMOTE_IP=${route_vpn_gateway}
 
 # Create PORTS nat list.
 iptables -t nat -N PORTS
