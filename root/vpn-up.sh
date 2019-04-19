@@ -1,7 +1,5 @@
 #! /bin/sh
 
-env > /tmp/openvpnclient
-
 PORT=${local_port_1}
 EXTERNAL_REMOTE_IP=${route_vpn_gateway}
 
@@ -20,12 +18,6 @@ iptables -t nat -A PREROUTING  -j DNAT --to-destination ${EXTERNAL_REMOTE_IP} -i
 iptables -t nat -A POSTROUTING -j MASQUERADE -o ${EXTERNAL_INTERFACE}
 iptables -t nat -A POSTROUTING -j MASQUERADE -o ${INTERNAL_INTERFACE}
 iptables -t nat -A POSTROUTING -j MASQUERADE -o ${HOME_INTERFACE}
-
-
-# Firewall (OLD)
-#iptables -t nat -A POSTROUTING -o ${EXTERNAL_INTERFACE} -j MASQUERADE
-#iptables -A FORWARD -i ${EXTERNAL_INTERFACE} -o ${INTERNAL_INTERFACE} -m state --state RELATED,ESTABLISHED -j ACCEPT
-#iptables -A FORWARD -i ${INTERNAL_INTERFACE} -o ${EXTERNAL_INTERFACE} -j ACCEPT
 
 # dns
 cp /etc/resolv.conf /etc/dnsmasq_resolv.conf
