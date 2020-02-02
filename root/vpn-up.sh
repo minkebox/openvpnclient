@@ -1,11 +1,10 @@
 #! /bin/sh
 
-#PORT=${local_port_1}
 EXTERNAL_REMOTE_IP=${route_vpn_gateway}
 
 # Create PORTS nat list.
-iptables -t nat -N PORTS
-iptables -t nat -A PREROUTING -i ${EXTERNAL_INTERFACE} -j PORTS
+#iptables -t nat -N PORTS
+#iptables -t nat -A PREROUTING -i ${EXTERNAL_INTERFACE} -j PORTS
 
 # Create MINIUPNPD nat list.
 iptables -t nat    -N MINIUPNPD
@@ -27,14 +26,13 @@ iptabels -t nat    -F MINIUPNPD-POSTROUTING
 iptables -A INPUT  -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -i ${HOME_INTERFACE}
 # Any traffic which arrives on the home network is immediately forwarded to the other end of the private
 # network except if its traffic for the OpenVPN.
-#iptables -t nat -A PREROUTING -p udp --sport ${PORT} -j ACCEPT -i ${HOME_INTERFACE}
 iptables -t nat -A PREROUTING --from-source ${EXTERNAL_REMOTE_IP} -j ACCEPT -i ${HOME_INTERFACE}
 iptables -t nat -A PREROUTING  -j DNAT --to-destination ${EXTERNAL_REMOTE_IP} -i ${HOME_INTERFACE}
 
 # Masquarade outgoing traffic on all networks. This hides the internals of the routing from everyone.
 iptables -t nat -A POSTROUTING -j MASQUERADE -o ${EXTERNAL_INTERFACE}
-iptables -t nat -A POSTROUTING -j MASQUERADE -o ${INTERNAL_INTERFACE}
-iptables -t nat -A POSTROUTING -j MASQUERADE -o ${HOME_INTERFACE}
+#iptables -t nat -A POSTROUTING -j MASQUERADE -o ${INTERNAL_INTERFACE}
+#iptables -t nat -A POSTROUTING -j MASQUERADE -o ${HOME_INTERFACE}
 
 # dns
 cp /etc/resolv.conf /etc/dnsmasq_resolv.conf
@@ -52,12 +50,12 @@ done
 /usr/sbin/miniupnpd
 
 # Cycle thought the ports and setup forwarding
-for p in $(seq 0 ${PORTMAX}); do
-  v=$(eval "echo \$PORT_${p}")
-  ip=$(echo ${v} | cut -d':' -f1)
-  port=$(echo ${v} | cut -d':' -f2)
-  protocol=$(echo ${v} | cut -d':' -f3)
-  if [ ${port} != 0 ]; then
-    iptables -t nat -A PORTS -p ${protocol} --dport ${port} -j DNAT --to-destination ${ip}:${port} -i ${EXTERNAL_INTERFACE}
-  fi
-done
+#for p in $(seq 0 ${PORTMAX}); do
+#  v=$(eval "echo \$PORT_${p}")
+#  ip=$(echo ${v} | cut -d':' -f1)
+#  port=$(echo ${v} | cut -d':' -f2)
+#  protocol=$(echo ${v} | cut -d':' -f3)
+#  if [ ${port} != 0 ]; then
+#    iptables -t nat -A PORTS -p ${protocol} --dport ${port} -j DNAT --to-destination ${ip}:${port} -i ${EXTERNAL_INTERFACE}
+#  fi
+#done
