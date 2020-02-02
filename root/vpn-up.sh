@@ -8,8 +8,20 @@ iptables -t nat -N PORTS
 iptables -t nat -A PREROUTING -i ${EXTERNAL_INTERFACE} -j PORTS
 
 # Create MINIUPNPD nat list.
-iptables -t nat -N MINIUPNPD
-iptables -t nat -A PREROUTING -i ${EXTERNAL_INTERFACE} -j MINIUPNPD
+iptables -t nat    -N MINIUPNPD
+iptables -t mangle -N MINIUPNPD
+iptables -t filter -N MINIUPNPD
+iptables -t nat    -N MINIUPNPD-POSTROUTING
+
+iptables -t nat    -I PREROUTING  -i ${EXTERNAL_INTERFACE} -j MINIUPNPD
+iptables -t mangle -I PREROUTING  -i ${EXTERNAL_INTERFACE} -j MINIUPNPD
+iptables -t filter -I FORWARD     -i ${EXTERNAL_INTERFACE} ! -o ${EXTERNAL_INTERFACE} -j MINIUPNPD
+iptables -t nat    -I POSTROUTING -o ${EXTERNAL_INTERFACE} -j MINIUPNPD-POSTROUTING
+
+iptables -t nat    -F MINIUPNPD
+iptables -t mangle -F MINIUPNPD
+iptables -t filter -F MINIUPNPD
+iptabels -t nat    -F MINIUPNPD-POSTROUTING
 
 # Allow traffic in and out if we've started a connection out
 iptables -A INPUT  -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -i ${HOME_INTERFACE}
