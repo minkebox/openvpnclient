@@ -1,4 +1,4 @@
-FROM alpine:3.11
+FROM alpine:3.5
 
 RUN apk --no-cache add openvpn dnsmasq miniupnpd ;\
     rm -f /etc/openvpn/* /etc/dnsmasq.conf
