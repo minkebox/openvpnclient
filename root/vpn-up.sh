@@ -7,6 +7,10 @@ EXTERNAL_REMOTE_IP=${route_vpn_gateway}
 iptables -t nat -N PORTS
 iptables -t nat -A PREROUTING -i ${EXTERNAL_INTERFACE} -j PORTS
 
+# Create MINIUPNPD nat list.
+iptables -t nat -N MINIUPNPD
+iptables -t nat -A PREROUTING -i ${EXTERNAL_INTERFACE} -j MINIUPNPD
+
 # Allow traffic in and out if we've started a connection out
 iptables -A INPUT  -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -i ${HOME_INTERFACE}
 # Any traffic which arrives on the home network is immediately forwarded to the other end of the private
@@ -31,6 +35,9 @@ for i in ${foreign_option_1} ${foreign_option_2} ${foreign_option_3} ${foreign_o
   fi
 done
 /usr/sbin/dnsmasq
+
+# upnp
+/usr/sbin/miniupnpd
 
 # Cycle thought the ports and setup forwarding
 for p in $(seq 0 ${PORTMAX}); do
