@@ -6,17 +6,15 @@ EXTERNAL_REMOTE_IP=${route_vpn_gateway}
 #iptables -t nat -N PORTS
 #iptables -t nat -A PREROUTING -i ${EXTERNAL_INTERFACE} -j PORTS
 
-# Create MINIUPNPD nat list.
+# Create MINIUPNPD lists.
 iptables -t nat    -N MINIUPNPD
 iptables -t mangle -N MINIUPNPD
 iptables -t filter -N MINIUPNPD
 iptables -t nat    -N MINIUPNPD-POSTROUTING
-
 iptables -t nat    -I PREROUTING  -i ${EXTERNAL_INTERFACE} -j MINIUPNPD
 iptables -t mangle -I PREROUTING  -i ${EXTERNAL_INTERFACE} -j MINIUPNPD
 iptables -t filter -I FORWARD     -i ${EXTERNAL_INTERFACE} ! -o ${EXTERNAL_INTERFACE} -j MINIUPNPD
 iptables -t nat    -I POSTROUTING -o ${EXTERNAL_INTERFACE} -j MINIUPNPD-POSTROUTING
-
 iptables -t nat    -F MINIUPNPD
 iptables -t mangle -F MINIUPNPD
 iptables -t filter -F MINIUPNPD
