@@ -2,10 +2,6 @@
 
 EXTERNAL_REMOTE_IP=${route_vpn_gateway}
 
-# Create PORTS nat list.
-#iptables -t nat -N PORTS
-#iptables -t nat -A PREROUTING -i ${EXTERNAL_INTERFACE} -j PORTS
-
 # Create MINIUPNPD lists.
 iptables -t nat    -N MINIUPNPD
 iptables -t mangle -N MINIUPNPD
@@ -46,14 +42,3 @@ done
 
 # upnp
 /usr/sbin/miniupnpd
-
-# Cycle thought the ports and setup forwarding
-#for p in $(seq 0 ${PORTMAX}); do
-#  v=$(eval "echo \$PORT_${p}")
-#  ip=$(echo ${v} | cut -d':' -f1)
-#  port=$(echo ${v} | cut -d':' -f2)
-#  protocol=$(echo ${v} | cut -d':' -f3)
-#  if [ ${port} != 0 ]; then
-#    iptables -t nat -A PORTS -p ${protocol} --dport ${port} -j DNAT --to-destination ${ip}:${port} -i ${EXTERNAL_INTERFACE}
-#  fi
-#done
