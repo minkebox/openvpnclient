@@ -25,8 +25,8 @@ iptables -t nat -A PREROUTING  -j DNAT --to-destination ${EXTERNAL_REMOTE_IP} -i
 
 # Masquarade outgoing traffic on all networks. This hides the internals of the routing from everyone.
 iptables -t nat -A POSTROUTING -j MASQUERADE -o ${EXTERNAL_INTERFACE}
-#iptables -t nat -A POSTROUTING -j MASQUERADE -o ${INTERNAL_INTERFACE}
-#iptables -t nat -A POSTROUTING -j MASQUERADE -o ${HOME_INTERFACE}
+iptables -t nat -A POSTROUTING -j MASQUERADE -o ${INTERNAL_INTERFACE}
+iptables -t nat -A POSTROUTING -j MASQUERADE -o ${HOME_INTERFACE}
 
 # dns
 cp /etc/resolv.conf /etc/dnsmasq_resolv.conf
