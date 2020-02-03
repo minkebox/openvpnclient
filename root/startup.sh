@@ -12,9 +12,13 @@ if [ ! -e ${CONFIG} ]; then
   exit 1
 fi
 
-AUTH=/tmp/userpw.conf
-
-# Create user/password file
+# Create user/password file. Empty auth files are bad so make sure we have something even if its not needed.
+if [ "${USER}" = "" ]; then
+  USER="missing"
+fi
+if [ "${PASSWORD}" = "" ]; then
+  PASSWORD="missing"
+fi
 echo ${USER} > ${AUTH}
 echo ${PASSWORD} >> ${AUTH}
 
