@@ -6,12 +6,13 @@ EXTERNAL_INTERFACE=tun0
 
 CONFIG=/etc/openvpn/config.ovpn
 AUTH=/tmp/userpw.conf
+FCONFIG=/tmp/config.ovpn
 
 # Pre-create device
 openvpn --mktun --dev ${EXTERNAL_INTERFACE}
 
 # Force device
-cat ${CONFIG} | sed "s/^dev\s*\{1,\}tun.*$/dev ${EXTERNAL_INTERFACE}/" > /config.ovpn
+cat ${CONFIG} | sed "s/^dev\s*\{1,\}tun.*$/dev ${EXTERNAL_INTERFACE}/" > ${FCONFIG}
 
 # Create MINIUPNPD lists.
 iptables -t nat    -N MINIUPNPD
@@ -45,7 +46,7 @@ fi
 echo ${USER} > ${AUTH}
 echo ${PASSWORD} >> ${AUTH}
 
-openvpn --daemon --config /config.ovpn --auth-user-pass ${AUTH} --script-security 2 --up /vpn-up.sh
+openvpn --daemon --config ${FCONFIG} --auth-user-pass ${AUTH} --script-security 2 --up /vpn-up.sh
 
 # upnp
 /usr/sbin/miniupnpd
