@@ -25,7 +25,7 @@ iptables -t nat    -I POSTROUTING -o ${EXTERNAL_INTERFACE} -j MINIUPNPD-POSTROUT
 iptables -t nat    -F MINIUPNPD
 iptables -t mangle -F MINIUPNPD
 iptables -t filter -F MINIUPNPD
-iptabels -t nat    -F MINIUPNPD-POSTROUTING
+iptables -t nat    -F MINIUPNPD-POSTROUTING
 
 # Allow traffic in and out if we've started a connection out
 iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -i ${HOME_INTERFACE}
