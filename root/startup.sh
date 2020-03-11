@@ -7,13 +7,11 @@ EXTERNAL_INTERFACE=tun0
 CONFIG=/etc/openvpn/config.ovpn
 AUTH=/tmp/userpw.conf
 
-if [ ! -e ${CONFIG} ]; then
-  echo "Missing client config"
-  exit 1
-fi
-
 # Pre-create device
 openvpn --mktun --dev ${EXTERNAL_INTERFACE}
+
+# Force device
+cat ${CONFIG} | sed "s/^dev\s*\{1,\}tun.*$/dev ${EXTERNAL_INTERFACE}/" > /config.ovpn
 
 # Create MINIUPNPD lists.
 iptables -t nat    -N MINIUPNPD
@@ -47,7 +45,7 @@ fi
 echo ${USER} > ${AUTH}
 echo ${PASSWORD} >> ${AUTH}
 
-openvpn --daemon --config ${CONFIG} --auth-user-pass ${AUTH} --script-security 2 \
+openvpn --daemon --config /config.ovpn --auth-user-pass ${AUTH} --script-security 2 \
   --up "/usr/bin/env HOME_INTERFACE=${HOME_INTERFACE} /vpn-up.sh" \
   --down "/usr/bin/env HOME_INTERFACE=${HOME_INTERFACE} /vpn-down.sh"
 
