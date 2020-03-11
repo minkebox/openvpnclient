@@ -28,7 +28,7 @@ iptables -t filter -F MINIUPNPD
 iptabels -t nat    -F MINIUPNPD-POSTROUTING
 
 # Allow traffic in and out if we've started a connection out
-iptables -A INPUT  -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -i ${HOME_INTERFACE}
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -i ${HOME_INTERFACE}
 
 # Masquarade outgoing traffic on all networks. This hides the internals of the routing from everyone.
 iptables -t nat -A POSTROUTING -j MASQUERADE -o ${EXTERNAL_INTERFACE}
@@ -45,9 +45,7 @@ fi
 echo ${USER} > ${AUTH}
 echo ${PASSWORD} >> ${AUTH}
 
-openvpn --daemon --config /config.ovpn --auth-user-pass ${AUTH} --script-security 2 \
-  --up "/usr/bin/env HOME_INTERFACE=${HOME_INTERFACE} /vpn-up.sh" \
-  --down "/usr/bin/env HOME_INTERFACE=${HOME_INTERFACE} /vpn-down.sh"
+openvpn --daemon --config /config.ovpn --auth-user-pass ${AUTH} --script-security 2 --up /vpn-up.sh
 
 # upnp
 /usr/sbin/miniupnpd
