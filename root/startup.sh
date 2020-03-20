@@ -34,6 +34,10 @@ iptables -t nat -A POSTROUTING -j MASQUERADE -o ${EXTERNAL_INTERFACE}
 iptables -t nat -A POSTROUTING -j MASQUERADE -o ${__INTERNAL_INTERFACE}
 iptables -t nat -A POSTROUTING -j MASQUERADE -o ${__DEFAULT_INTERFACE}
 
+# Remove default route setup by helper
+ip route del 0.0.0.0/1
+ip route del 128.0.0.0/1
+
 # Create user/password file. Empty auth files are bad so make sure we have something even if its not needed.
 if [ "${USER}" = "" ]; then
   USER="missing"
