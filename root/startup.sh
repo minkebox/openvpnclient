@@ -1,7 +1,5 @@
 #! /bin/sh
 
-HOME_INTERFACE=${__HOME_INTERFACE}
-INTERNAL_INTERFACE=${__PRIVATE_INTERFACE}
 EXTERNAL_INTERFACE=tun0
 
 CONFIG=/etc/openvpn/config.ovpn
@@ -29,12 +27,12 @@ iptables -t filter -F MINIUPNPD
 iptables -t nat    -F MINIUPNPD-POSTROUTING
 
 # Allow traffic in and out if we've started a connection out
-iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -i ${HOME_INTERFACE}
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT -i ${__DEFAULT_INTERFACE}
 
 # Masquarade outgoing traffic on all networks. This hides the internals of the routing from everyone.
 iptables -t nat -A POSTROUTING -j MASQUERADE -o ${EXTERNAL_INTERFACE}
-iptables -t nat -A POSTROUTING -j MASQUERADE -o ${INTERNAL_INTERFACE}
-iptables -t nat -A POSTROUTING -j MASQUERADE -o ${HOME_INTERFACE}
+iptables -t nat -A POSTROUTING -j MASQUERADE -o ${__INTERNAL_INTERFACE}
+iptables -t nat -A POSTROUTING -j MASQUERADE -o ${__DEFAULT_INTERFACE}
 
 # Create user/password file. Empty auth files are bad so make sure we have something even if its not needed.
 if [ "${USER}" = "" ]; then
