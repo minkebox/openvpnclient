@@ -12,6 +12,10 @@ openvpn --mktun --dev ${EXTERNAL_INTERFACE}
 # Force device
 cat ${CONFIG} | sed "s/^dev\s*\{1,\}tun.*$/dev ${EXTERNAL_INTERFACE}/" > ${FCONFIG}
 
+# Monitoring
+iptables -I FORWARD -o ${EXTERNAL_INTERFACE} -j TX
+iptables -I FORWARD -i ${EXTERNAL_INTERFACE} -j RX
+
 # Create MINIUPNPD lists.
 iptables -t nat    -N MINIUPNPD
 iptables -t mangle -N MINIUPNPD
