@@ -4,7 +4,10 @@
 ifconfig tun0 || exit 1
 
 # Check we can ping other end
-ADDR=$(ifconfig tun0 | grep P-t-P | sed 's/.*P-t-P:\(.*\) .*/\1/')
+ADDR=$(ip route | grep 0.0.0.0 | sed "s/.*via \([0-9.]*\) dev.*/\1/")
 ping -w 1 ${ADDR} || exit 1
+
+# Check DNS is up
+nslookup localhost 127.0.0.1 || exit 1
 
 exit 0
