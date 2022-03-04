@@ -6,6 +6,10 @@
   tags: [ 'VPN', 'Security', 'Networking' ],
   actions: [
     {
+      type: `Header`,
+      title: `Credentials`
+    },
+    {
       type: `EditEnvironment`,
       description: `Enter your VPN username`,
       name: `USER`,
@@ -21,7 +25,22 @@
       type: `EditFile`,
       description: `Drop your .ovpn configuration file here`,
       name: `/etc/openvpn/config.ovpn`
+    },
+    {
+      type: `Header`,
+      title: `Network`,
+      visible: `property.Advanced`
+    },
+    {
+      type: `Text`,
+      text: `Select which network this VPN will use. You probably want <b>home</b> unless the VPN is running over a private network.`
+    },
+    {
+      type: `SelectNetwork`,
+      name: `primary`,
+      description: `Select network`
     }
+
   ],
   properties: [
     {
